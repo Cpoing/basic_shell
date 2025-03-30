@@ -35,6 +35,14 @@ func main() {
 		}
 	}
 
+  commands["ls"] = func(args []string) {
+    entries, _ := os.ReadDir("./")
+
+    for _, e := range entries {
+      fmt.Println(e.Name())
+    }
+  }
+
   for {
     fmt.Fprint(os.Stdout, "$ ")
 
