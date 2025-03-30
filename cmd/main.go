@@ -36,10 +36,19 @@ func main() {
 	}
 
   commands["ls"] = func(args []string) {
-    entries, _ := os.ReadDir("./")
-
-    for _, e := range entries {
-      fmt.Println(e.Name())
+    if len(args) > 0 {
+      for dir := range args {
+        entries, _ := os.ReadDir(args[dir])
+        for _, e := range entries {
+          fmt.Println(e.Name())
+        }
+      }
+      
+    } else if len(args) == 0 {
+      entries, _ := os.ReadDir("./")
+      for _, e := range entries {
+        fmt.Println(e.Name())
+      }
     }
   }
 
