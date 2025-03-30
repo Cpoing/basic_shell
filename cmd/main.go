@@ -1,16 +1,16 @@
 package main
 
 import (
-  "strings"
 	"bufio"
 	"fmt"
 	"os"
+	"strings"
 )
 
 type commandFunc func(args []string)
 
 func main() {
-  commands := make(map[string]commandFunc)
+	commands := make(map[string]commandFunc)
 
 	commands["exit"] = func(args []string) {
 		if len(args) > 0 && args[0] == "0" {
@@ -35,47 +35,65 @@ func main() {
 		}
 	}
 
-  commands["ls"] = func(args []string) {
-    if len(args) > 0 {
-      for dir := range args {
-        entries, _ := os.ReadDir(args[dir])
-        for _, e := range entries {
-          fmt.Println(e.Name())
-        }
-      }
-      
-    } else if len(args) == 0 {
-      entries, _ := os.ReadDir("./")
-      for _, e := range entries {
-        fmt.Println(e.Name())
-      }
-    }
-  }
+	commands["ls"] = func(args []string) {
+		if len(args) > 0 {
+			for dir := range args {
+				entries, _ := os.ReadDir(args[dir])
+				for _, e := range entries {
+					fmt.Println(e.Name())
+				}
+			}
 
-  for {
-    fmt.Fprint(os.Stdout, "$ ")
+		} else if len(args) == 0 {
+			entries, _ := os.ReadDir("./")
+			for _, e := range entries {
+				fmt.Println(e.Name())
+			}
+		}
+	}
 
-	  // Wait for user input
-    command, err := bufio.NewReader(os.Stdin).ReadString('\n')
-    if err != nil {
-      fmt.Fprintln(os.Stderr, "Error reading input:", err)
-      os.Exit(1)
-    }
+	commands["cat"] = func(args []string) {
+		if len(args) == 0 {
+			file, err := os.ReadFile(args[0])
+			if err != nil {
+				fmt.Printf("cat: %s: No such file or directory\n", args)
+			}
+			fmt.Println(string(file))
+		} else if len(args) > 1 {
+			for path := range args {
+				file, err := os.ReadFile(args[path])
+				if err != nil {
+					fmt.Printf("cat: %s: No such file or directory\n", args)
+				}
+				fmt.Println(string(file))
+			}
+		}
 
-    command = strings.TrimSpace(command)
-    if command == "" {
-      continue
-    }
+	}
 
-    parts := strings.Fields(command)
-    commandName := parts[0]
-    args := parts[1:]
+	for {
+		fmt.Fprint(os.Stdout, "$ ")
 
-    if cmd, exists := commands[commandName]; exists {
-      cmd(args)
-    } else {
-      fmt.Printf("%s: command not found\n", commandName)
-    }
-  }
+		// Wait for user input
+		command, err := bufio.NewReader(os.Stdin).ReadString('\n')
+		if err != nil {
+			fmt.Fprintln(os.Stderr, "Error reading input:", err)
+			os.Exit(1)
+		}
+
+		command = strings.TrimSpace(command)
+		if command == "" {
+			continue
+		}
+
+		parts := strings.Fields(command)
+		commandName := parts[0]
+		args := parts[1:]
+
+		if cmd, exists := commands[commandName]; exists {
+			cmd(args)
+		} else {
+			fmt.Printf("%s: command not found\n", commandName)
+		}
+	}
 }
-
