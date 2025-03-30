@@ -53,7 +53,7 @@ func main() {
 	}
 
 	commands["cat"] = func(args []string) {
-		if len(args) == 0 {
+		if len(args) == 1 {
 			file, err := os.ReadFile(args[0])
 			if err != nil {
 				fmt.Printf("cat: %s: No such file or directory\n", args)
@@ -67,7 +67,9 @@ func main() {
 				}
 				fmt.Println(string(file))
 			}
-		}
+		} else {
+      fmt.Println("cat: Must have at least 1 argument")
+    }
 
 	}
 
